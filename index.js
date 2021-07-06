@@ -102,5 +102,8 @@ app.get('/fullStat', function (req, res) {
 })
 
 
-const PORT = 5000
-app.listen(PORT, console.log(`Server started on port ${PORT}`))
+// PORT
+const port = process.env.PORT || 8000
+app.listen(port, () => {
+  console.log(`App listening on port ${port}!`)
+})
