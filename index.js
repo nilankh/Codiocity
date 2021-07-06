@@ -1,21 +1,106 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+var express = require('express');
+
 var compiler = require('compilex');
 
-const app = express();
-// app.use(bodyParser())
-// this is deprecated.
+var app = express();
 
-// app.use(
-//   bodyParser.urlencoded({
-//     extended: true,
-//   })
-// )
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 var options = { stats: true } //prints stats on console
 compiler.init(options)
+
+app.get('/', function (req, res) {
+  res.sendFile(__dirname + '/index.html')
+})
+app.post('/compilecode', function (req, res) {
+  var code = req.body.code
+  var input = req.body.input
+  var inputRadio = req.body.inputRadio
+  var lang = req.body.lang
+  if (lang === 'C' || lang === 'C++') {
+    if (inputRadio === 'true') {
+      var envData = { OS: 'windows', cmd: 'g++' }
+      compiler.compileCPPWithInput(envData, code, input, function (data) {
+        if (data.error) {
+          res.send(data.error)
+        } else {
+          res.send(data.output)
+        }
+      })
+    } else {
+      var envData = { OS: 'windows', cmd: 'g++' }
+      compiler.compileCPP(envData, code, function (data) {
+        if (data.error) {
+          res.send(data.error)
+        } else {
+          res.send(data.output)
+        }
+      })
+    }
+  }
+  if (lang === 'Java') {
+    if (inputRadio === 'true') {
+      var envData = { OS: 'windows' }
+      console.log(code)
+      compiler.compileJavaWithInput(envData, code, function (data) {
+        res.send(data)
+      })
+    } else {
+      var envData = { OS: 'windows' }
+      console.log(code)
+      compiler.compileJavaWithInput(envData, code, input, function (data) {
+        res.send(data)
+      })
+    }
+  }
+  if (lang === 'Python') {
+    if (inputRadio === 'true') {
+      var envData = { OS: 'windows' }
+      compiler.compilePythonWithInput(envData, code, input, function (data) {
+        res.send(data)
+      })
+    } else {
+      var envData = { OS: 'windows' }
+      compiler.compilePython(envData, code, function (data) {
+        res.send(data)
+      })
+    }
+  }
+  if (lang === 'CS') {
+    if (inputRadio === 'true') {
+      var envData = { OS: 'windows' }
+      compiler.compileCSWithInput(envData, code, input, function (data) {
+        res.send(data)
+      })
+    } else {
+      var envData = { OS: 'windows' }
+      compiler.compileCS(envData, code, function (data) {
+        res.send(data)
+      })
+    }
+  }
+  if (lang === 'VB') {
+    if (inputRadio === 'true') {
+      var envData = { OS: 'windows' }
+      compiler.compileVBWithInput(envData, code, input, function (data) {
+        res.send(data)
+      })
+    } else {
+      var envData = { OS: 'windows' }
+      compiler.compileVB(envData, code, function (data) {
+        res.send(data)
+      })
+    }
+  }
+})
+
+app.get('/fullStat', function (req, res) {
+  compiler.fullStat(function (data) {
+    res.send(data)
+  })
+})
+
 
 const PORT = 5000
 app.listen(PORT, console.log(`Server started on port ${PORT}`))
